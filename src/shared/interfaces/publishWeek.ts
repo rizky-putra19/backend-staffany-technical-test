@@ -1,4 +1,4 @@
-export interface ICreatePublishWeek {
+export interface IPublishWeek {
     startDate: string;
     endDate: string;
   }
