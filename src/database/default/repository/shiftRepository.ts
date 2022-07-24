@@ -1,6 +1,5 @@
 import {
   getRepository,
-  FindManyOptions,
   FindOneOptions,
   FindConditions,
   DeleteResult,
@@ -9,12 +8,12 @@ import {
 import moduleLogger from "../../../shared/functions/logger";
 import Shift from "../entity/shift";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
-import {
-  checkOverlapping,
-  checkPublish,
-} from "../../../shared/helpers/checkingHelpers";
+import { checkOverlapping, checkPublishWeek } from "../../../shared/helpers/checkingHelpers";
 import { HttpError } from "../../../shared/classes/HttpError";
-import { IFindResponse, IFindShift, IPublishShifts } from "../../../shared/interfaces";
+import {
+  IFindResponse,
+  IFindShift,
+} from "../../../shared/interfaces";
 
 const logger = moduleLogger("shiftRepository");
 
@@ -73,6 +72,10 @@ export const create = async (payload: Shift): Promise<Shift> => {
   logger.info("Create");
   const repository = getRepository(Shift);
   const check = await checkOverlapping(payload);
+  const checkPublish = await checkPublishWeek(payload);
+  if (checkPublish) {
+    throw new HttpError(400, "already publish");
+  }
   if (check) {
     throw new HttpError(400, "shift is overlapping");
   }
@@ -86,38 +89,24 @@ export const updateById = async (
 ): Promise<Shift> => {
   logger.info("Update by id");
   const repository = getRepository(Shift);
-  const check = await checkPublish(id);
-  if (check) {
-    throw new HttpError(400, "cannot update already published");
+  const shift = await findById(id);
+  const checkPublish = await checkPublishWeek(shift);
+  if (checkPublish) {
+    throw new HttpError(400, "already publish");
   }
   await repository.update(id, payload);
   return findById(id);
 };
 
 export const deleteById = async (
-  id: string | string[]
+  id: string
 ): Promise<DeleteResult> => {
   logger.info("Delete by id");
   const repository = getRepository(Shift);
-  const check = await checkPublish(id);
-  if (check) {
-    throw new HttpError(400, "cannot delete already published");
+  const shift = await findById(id);
+  const checkPublish = await checkPublishWeek(shift);
+  if (checkPublish) {
+    throw new HttpError(400, "already publish");
   }
   return await repository.delete(id);
-};
-
-export const publishShifts = async (payload: IPublishShifts): Promise<Shift[]> => {
-  logger.info("publish shift");
-  const results:Shift[] = [];
-  const publish = await Promise.all(
-    payload.ids.map(async (shift) => {
-      const check = await checkPublish(shift);
-      if (check) {
-        throw new HttpError(400, "cannot update already published");
-      }
-      await updateById(shift, {publish: true})
-      return results.push(await findById(shift));
-    })
-  );
-  return results;
 };

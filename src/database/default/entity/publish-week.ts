@@ -1,27 +1,19 @@
-import { boolean } from "joi";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { BaseTimestamp } from "./baseTimestamp";
 
 @Entity()
-export default class Shift extends BaseTimestamp {
+export default class PublishWeek extends BaseTimestamp {
   @PrimaryGeneratedColumn("uuid")
   id: string;
-
-  @Column()
-  name: string;
 
   @Column({
     type: "date",
   })
-  date: string;
+  startDate: string;
 
   @Column({
-    type: "time",
+    type: "date",
   })
-  startTime: string;
-
-  @Column({
-    type: "time",
-  })
-  endTime: string;
+  endDate: string;
 }
+

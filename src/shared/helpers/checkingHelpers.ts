@@ -1,5 +1,7 @@
-import { getRepository } from "typeorm";
+import { Between, getRepository } from "typeorm";
 import Shift from "../../database/default/entity/shift";
+import moment from "moment";
+import PublishWeek from "../../database/default/entity/publish-week";
 
 export const checkOverlapping = async (payload: Shift): Promise<boolean> => {
   const { name, date, startTime, endTime } = payload;
@@ -18,15 +20,17 @@ export const checkOverlapping = async (payload: Shift): Promise<boolean> => {
   return false;
 };
 
-export const checkPublish = async (id: string | string[]): Promise<boolean> => {
-  const repository = getRepository(Shift);
-  const check = await repository.findOne({
-    where: {
-      id,
-    },
+export const checkPublishWeek = async (payload: Shift): Promise<boolean> => {
+  let result = false;
+  const { date } = payload;
+  const repository = getRepository(PublishWeek);
+  const isPublish = await repository.find();
+  isPublish.forEach((a) => {
+    const startDate = new Date(a.startDate);
+    const endDate = new Date(a.endDate);
+    if (new Date(date) >= startDate && new Date(date) <= endDate) {
+      result = true;
+    }
   });
-  if (check.publish) {
-    return true;
-  }
-  return false;
+  return result;
 };

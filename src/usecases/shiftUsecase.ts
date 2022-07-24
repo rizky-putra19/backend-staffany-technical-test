@@ -33,10 +33,6 @@ export const updateById = async (
   });
 };
 
-export const deleteById = async (id: string | string[]) => {
+export const deleteById = async (id: string) => {
   return shiftRepository.deleteById(id);
 };
-
-export const publishShifts = async (payload: IPublishShifts) => {
-  return shiftRepository.publishShifts(payload);
-}

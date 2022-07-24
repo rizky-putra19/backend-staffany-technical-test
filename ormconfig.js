@@ -12,8 +12,8 @@ module.exports = [
     database: process.env.DB_NAME || "hapi-boilerplate",
     entities:
       process.env.NODE_ENV === "production"
-        ? ["dist/src/database/default/entity/shift.js"]
-        : ["src/database/default/entity/shift.ts"],
+        ? ["dist/src/database/default/entity/publish-week.js", "dist/src/database/default/entity/shift.js"]
+        : ["src/database/default/entity/publish-week.ts", "src/database/default/entity/shift.ts"],
     synchronize: true,
     logging: false,
     migrations:

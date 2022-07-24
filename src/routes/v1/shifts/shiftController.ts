@@ -99,20 +99,3 @@ export const deleteById = async (req: Request, h: ResponseToolkit) => {
     return errorHandler(h, error);
   }
 };
-
-export const publishShifts = async (req: Request, h: ResponseToolkit) => {
-  logger.info("Published shifts");
-  try {
-    const ids = req.payload as IPublishShifts;
-    const data = await shiftUsecase.publishShifts(ids);
-    const res: ISuccessResponse = {
-      statusCode: 200,
-      message: "Publish shifts successful",
-      results: data,
-    }
-    return res;
-  } catch (error) {
-    logger.error(error);
-    return errorHandler(h, error);
-  }
-}

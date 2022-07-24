@@ -74,15 +74,4 @@ export default function (server: Server, basePath: string) {
       },
     },
   });
-
-  server.route({
-    method: "POST",
-    path: basePath + "/publish-shifts",
-    handler: shiftController.publishShifts,
-    options: {
-      description: "Publish shifts",
-      notes: "Publish shifts",
-      tags: ["api", "shift"],
-    },
-  });
 }
